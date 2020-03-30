@@ -1,0 +1,310 @@
+---
+title: "Data"
+output: 
+  learnr::tutorial:
+   progressive: true
+   allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+
+library(learnr)
+knitr::opts_chunk$set(echo = TRUE)
+learnr::tutorial_options(exercise.completion = FALSE)
+
+```
+
+## Disclaimer
+
+The content of this tutorial draws heavily on the following sources:
+
+- [R4DS by Garrett Grolemund & Hadley Wickham](https://r4ds.had.co.nz/)
+
+- [Advanced R by Hadley Wickham](https://adv-r.hadley.nz/index.html#license)
+
+Before you proceed with this tutorial, make sure you have completed the
+following Rstudio primers:
+
+1. [The basics](https://rstudio.cloud/learn/primers/1)
+
+1. [Work with data](https://rstudio.cloud/learn/primers/2)
+
+
+## Introduction
+
+This is the third tutorial in a series that I have created to help 
+you learn more about R. Since this tutorial focuses on data, let's
+start with a broad definition of the `data.frame` class:
+
+### What is a `data.frame`?
+
+A `data.frame` is a special type of `list` vector. Specifically, a `data.frame`
+is a `list` that has the following conditions:
+
+- All elements of the `data.frame` are vectors comprising data of one type.
+
+- All elements of the `data.frame` have equal length.
+
+- All elements of the `data.frame` have a unique name.
+
+### Creating a `data.frame`
+
+Since a `data.frame` is a special kind of list, it is possible to coerce
+certain lists into a `data.frame`:
+
+```{r}
+
+lst <- list(
+  nmrs = 1:5,
+  chrs = letters[1:5]
+)
+
+df <- as.data.frame(lst)
+
+str(df)
+
+```
+
+You can also use the `data.frame()` function.
+
+```{r}
+
+df <- data.frame(
+  nmrs = 1:5,
+  chrs = letters[1:5]
+)
+
+str(df)
+
+```
+
+You can access attributes of `data.frame` objects just like vectors:
+
+```{r}
+
+# Print the column names
+names(df)
+colnames(df)
+
+# Print the rownames
+rownames(df)
+
+# Print the number of rows and number of columns
+dim(df)
+
+# Print just the number of rows
+nrow(df)
+
+# Print just the number of columns
+ncol(df)
+
+```
+
+### What if inputs are wrong?
+
+R will go to great lengths to help you convert a `list` into a `data.frame`.
+
+- If the component vectors are not of equal length, R will try to correct
+  the inputs using vector recycling.
+  
+  ```{r error = TRUE}
+  
+  # Recycling works here:
+  lst <- list(nmrs = 1, chrs = letters[1:5])
+  df <- as.data.frame(lst)
+  str(df)
+  
+  # And here...
+  lst <- list(nmrs = 1:3, chrs = letters[1:6])
+  df <- as.data.frame(lst)
+  str(df)
+  
+  # Will recycling work here?
+  lst <- list(nmrs = 1:3, chrs = letters[1:5])
+  df <- as.data.frame(lst)
+  
+  
+  ```
+  
+- If the components have data of a different type, R will try to coerce 
+  them into vectors containing data of a single type.
+
+  ```{r}
+  
+  lst <- list(nmrs = 1:5, chrs = list(lst_chr = "A", lst_nmr = 1))
+  df <- as.data.frame(lst)
+  str(df)  
+  
+  ```
+
+- If the vectors are not named, R will name them (poorly).
+
+```{r}
+
+lst <- list(1:5, letters[1:5])
+df <- as.data.frame(lst)
+str(df)
+
+```
+
+### Your turn
+
+Print a data frame with the following names and values
+
+- Name: `id`, values: `1:100`
+
+- Name: `score`, values: `100`
+
+- Name: `type`, values: the letter `'A'` repeated 50 times, followed 
+  by the letter `'B'` repeated 50 times.
+
+```{r make_df, exercise = TRUE}
+
+
+
+```
+
+```{r make_df-solution}
+
+data.frame(
+  id = 1:100,
+  score = 100,
+  type = rep(c("A","B"), each = 50)
+)
+
+```
+
+## Tidy tables (`tibble`)
+
+A `tibble` is an extension of the standard R `data.frame` class. In other 
+words, `tibble`s _are_ data frames, but they tweak some older behaviours 
+to make life a little (sometimes a lot) easier. R is an old language, and 
+some things that were useful 10 or 20 years ago now get in your way. It's
+difficult to change base R without breaking existing code, so most innovation
+occurs in packages. Here we will describe the __tibble__ package, which 
+provides opinionated data frames that make data analysis a little easier. 
+From here on out, I'll use the term `tibble` and data frame interchangeably; 
+when I want to draw particular attention to the standard R data frame, I'll 
+use the term `data.frame`. 
+
+If this chapter leaves you wanting to learn more about tibbles, you might 
+enjoy reading more at [tidyverse.org](https://tibble.tidyverse.org/index.html)
+
+### Creating a `tibble`
+
+A `data.frame` can be converted into a `tibble` using `as_tibble()`:
+
+```{r}
+
+# load the tibble package to access tibble functions
+library(tibble)
+
+df <- data.frame(
+  nmrs = 1:5,
+  chrs = letters[1:5]
+)
+
+as_tibble(df)
+
+```
+
+A `tibble` can also be created directly using the `tibble()` function.
+
+```{r}
+
+tibble_df <- tibble(
+  nmrs = 1:5,
+  chrs = letters[1:5]
+)
+
+tibble_df
+
+```
+
+`tibble()` will automatically recycle inputs of length 1 and allow you to 
+refer to variables that you just created, as shown below.
+
+```{r}
+
+tibble(
+  x = 1:5, 
+  y = 1, 
+  z = x ^ 2 + y
+)
+
+```
+
+`tibble()` does much less than `data.frame()`. it never changes the type of 
+the inputs (e.g. it never converts strings to factors!), it never changes 
+the names of variables, and it never creates row names.
+
+### Non-syntactic names
+
+It's possible for a tibble to have column names that are not valid R variable
+names, aka __non-syntactic__ names. For example, they might not start with a
+letter, or they might contain unusual characters like a space. To refer to 
+these variables, you need to surround them with backticks, `` ` ``:
+
+```{r}
+tb <- tibble(
+  `:)` = "smile", 
+  ` ` = "space",
+  `2000` = "number"
+)
+tb
+```
+
+You'll also need the backticks when working with these variables in other packages, like `ggplot2`, `dplyr`, and `tidyr`.
+
+## `tibble` vs. `data.frame`
+
+There are two main differences in the usage of a `tibble` vs. a classic `data.frame`: printing and subsetting.
+
+### Printing
+
+Tibbles have a refined print method that shows only the first 10 rows, and all the columns that fit on screen. This makes it much easier to work with large data. In addition to its name, each column reports its type, a nice feature borrowed from `str()`:
+
+```{r}
+
+tibble(
+  a = lubridate::now() + runif(1e3) * 86400,
+  b = lubridate::today() + runif(1e3) * 30,
+  c = 1:1e3,
+  d = runif(1e3),
+  e = sample(letters, 1e3, replace = TRUE)
+)
+
+```
+
+Tibbles are designed so that you don't accidentally overwhelm your console 
+when you print large data frames. But sometimes you need more output than 
+the default display. There are a few options that can help.
+
+First, you can explicitly `print()` the data frame and control the number 
+of rows (`n`) and the `width` of the display. `width = Inf` will display 
+all columns:
+
+```{r, eval = FALSE}
+nycflights13::flights %>% 
+  print(n = 10, width = Inf)
+```
+
+You can also control the default print behaviour by setting options:
+
+* `options(tibble.print_max = n, tibble.print_min = m)`: if more than `n`
+  rows, print only `m` rows. Use `options(tibble.print_min = Inf)` to always
+  show all rows.
+
+* Use `options(tibble.width = Inf)` to always print all columns, regardless
+  of the width of the screen.
+
+You can see a complete list of options by looking at the package help with `package?tibble`.
+
+A final option is to use RStudio's built-in data viewer to get a scrollable view of the complete dataset. This is also often useful at the end of a long chain of manipulations.
+
+```{r, eval = FALSE}
+nycflights13::flights %>% 
+  View()
+```
+
