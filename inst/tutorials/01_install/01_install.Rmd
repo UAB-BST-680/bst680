@@ -291,3 +291,25 @@ You will need to create a GitHub account in order to interact with me and your p
 ![](https://www.youtube.com/watch?v=2NxsjFtGjBA)
 
 For this course, you don't have to use git for version control. It is okay if you just use GitHub to interact and don't want to experiment with version control. However, speaking from my own experiences, I highly recommend learning how to use git with GitHub to manage your work. GitHub offers plenty of online tutorials to make this easy.
+
+## Getting credit
+
+To certify that you have completed this tutorial, send me an e-mail with
+
+- a screenshot of Rstudio running on your computer.
+
+- responses to the following items: 
+
+    + What is your GitHub account name?
+    
+    + Please describe your prior experience in programming. It is okay to say you have no prior experience. 
+    
+    + If you have prior experience using R, please describe. If not, just say 'None'
+    
+    + Please describe how much background knowledge you have in Statistics. It is okay to say you do not have any background knowledge (even if you previously took a Statistics course).
+    
+    + What do you hope to get from this course?
+    
+    + What do you find most interesting about data analysis? For example, I think using data to create and test prediction rules for clinical practice is really interesting.
+    
+
