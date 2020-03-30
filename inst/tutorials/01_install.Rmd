@@ -1,0 +1,293 @@
+---
+title: "BST 680 logistics"
+output:
+  learnr::tutorial:
+  progressive: true
+runtime: shiny_prerendered
+---
+  
+```{r setup, include=FALSE}
+
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.timelimit = 60)
+
+```
+
+## Welcome
+
+### Outline
+
+This tutorial will help you 
+
+- Download R and Rstudio
+
+- Set up R and Rstudio on your own computer. 
+
+- Install an R package
+
+- Create a GitHub account
+
+## Install R
+
+### How to install R
+
+Watch the video below for instructions on how to install R onto your own computer.
+
+![](https://vimeo.com/203516510)
+
+### Test your knowledge
+
+```{r quiz2, echo=FALSE}
+
+quiz(
+  caption = "Quiz - Install R",
+  question("Is R free to download and use?",
+    answer("Yes!",
+      correct = TRUE,
+      message = paste("R is free _and_ open source,", 
+        "which means that anyone can read, use,", 
+        "and copy the source code of the R language.")),
+    answer("No."),
+    allow_retry = TRUE
+  ),
+  question(
+    "Where do you download R?",
+    answer("www.rstudio.com/download"),
+    answer("[cloud.r-project.org](http://cloud.r-project.org)",
+      correct = TRUE,
+      message = paste("You can also download R from",
+        "[cran.r-project.org](http://cran.r-project.org)")),
+    answer("www.r-project.org", 
+      message = paste("Good try, but not exactly.",
+        "www.r-project.org doesn't provide a download link,",
+        "but it does provide a link to one the websites above.")),
+    allow_retry = TRUE
+  ),
+  question("How often should you update R?",
+    answer("Everytime you use it",
+      message = "This will be too often unless you use R very rarely!"),
+    answer("About once a year",
+      correct = TRUE,
+      message = paste("A new version of R is released about once a year.",
+        "Update sooner if you encounter a bug that you cannot explain.")),
+    answer("Never", 
+      message = paste("A new version of R is released about once a year.",
+        "I'll assume that you are using the newest version of R,",
+        "which will be the fastest version with the fewest",
+        "unexpected behaviors.")),
+    allow_retry = TRUE
+  )
+)
+
+```
+
+## Install RStudio
+
+### How to install RStudio
+
+RStudio is an **I**ntegrated **D**evelopment **E**nvironment (IDE) for R. You can think of RStudio as a program that helps you speak the R language. Watch the video below for instructions on how to install Rstudio onto your own computer. 
+
+![](https://vimeo.com/203516968)
+
+### Test your knowledge
+
+```{r quiz3, echo=FALSE}
+quiz(
+  caption = "Quiz - Install RStudio",
+  question(
+    "What is the RStudio IDE?",
+    answer("An application that makes it easier to use R.",
+      correct = TRUE,
+      message = paste("RStudio organizes your workspace and makes",
+      "it easier to write, use, debug, and save R code.",
+      "I highly recommend it and will rely on the RStudio IDE",
+      "in several tutorials.")
+    ),
+    answer("An application that let's you use R without writing any code",
+      message = paste("And thank goodness! Code provides a",
+      "reproducible record of your work, which is",
+      "essential for data science.")
+    ),
+    answer("A spreadsheet program like Microsoft Excel."),
+    answer("Another name for R", 
+      message = paste("R and RStudio are two separate things.",
+      "R is a language, like English. Think of RStudio as a program",
+      "that helps you use the language, kind of like how a word",
+      "processing program helps you write in English.")
+    ),
+    allow_retry = TRUE
+  ),
+  question(
+    "Is the RStudio IDE free to download and use?",
+    answer("Yes!", 
+      correct = TRUE, 
+      message = paste("Like R, RStudio is free and open-source.",
+      "There do exist professional versions of RStudio with enhanced",
+      "features, but we will not rely on those features",
+      "in these tutorials.")
+      ),
+    answer("No.", 
+      message = paste("Like R, RStudio is free and open-source.",
+        "There do exist professional versions of RStudio with",
+        "enhanced features, but we will not rely on those",
+        "features in these tutorials.")
+    ),
+    allow_retry = TRUE
+  ),
+  question(
+    "Where do you download RStudio?",
+    answer("www.rstudio.com/download",
+      correct = TRUE,
+      message = paste("For this class, all you need to do is,",
+        "download and install the RStudio Desktop Open Source License.",
+        "You do not need to pay for R unless you want to access some",
+        "very high tech features.")
+    ),
+    answer("[cloud.r-project.org](http://cloud.r-project.org)",
+      message = "This is where you download R, not RStudio."
+    ),
+    answer("www.r-project.org"),
+    answer("[cran.rstudio.org](http://cran.rstudio.org)"),
+    allow_retry = TRUE
+  ),
+  question(
+    "Do you need to install R if you already have RStudio?",
+    answer("Yes.", correct = TRUE),
+    answer("No.", 
+      message = paste("R does not come with RStudio;",
+        "you need to install R separately.")),
+    allow_retry = TRUE
+  )
+)
+```
+
+## Use Rstudio
+
+### Where do I start?
+
+I love the Rstudio IDE, but I also think it is a lot to take in the first time you see it. Take a look at the main components in this short intro video.
+
+![](https://vimeo.com/97166163)
+
+Next, get a little more familiar with the components of Rstudio with this overview and demo Rstudio. (The author of this video is Ben Stenhaug - his [YouYube channel](https://www.youtube.com/playlist?list=PLLxj8fULvXwGOf8uHlL4Tr62oXSB5k_in) has several helpful R tutorials.) 
+
+![](https://www.youtube.com/watch?v=lTTJPRwnONE)
+
+If you'd like a little more detail and explanation of the Rstudio IDE, you can find it [here](https://bookdown.org/ndphillips/YaRrr/the-four-rstudio-windows.html)
+
+### Test your knowledge
+
+```{r basics}
+
+quiz(
+  caption = "Quiz - Basics of R and Rstudio",
+  question("Which commands will assign a value of 1 to an object named x?",
+    answer("`x = 1`", correct = TRUE),
+    answer("`1 = x`", message = 'Close! Try the other way around.'),
+    answer("`x == 1`", message = 'This is a logical equals'),
+    answer("`x <- 1`",correct = TRUE),
+    message = paste("In R, there is more than one way to assign",
+    "values to objects. You can use whatever assignment operator",
+    "you want to, but I generally stick to using `<-` to assign",
+    "values (happy to discuss this in person if you want)."),
+    allow_retry = TRUE
+  ),
+  question("Which parts of Rstudio allow you to write and run code?",
+    answer("in the R console", correct = TRUE),
+    answer("in the the R environment window",
+      message = paste('this is where you can see what objects",
+        "are saved in your current R session.')
+    ),
+    answer("in an R script.", correct = TRUE),
+    answer("in the R help window",
+      message = paste("this is where you can read documentation")
+    ),
+    message = paste("The console window lets you write code interactively,",
+    "and the source window lets you write code in a script that you can",
+    "save and open up later. The console is great for interactive work,",
+    "and the source is great for writing solutions to longer problems",
+    "with multiple steps."),
+    allow_retry = TRUE
+  ),
+  question("How do run code from the source window without the mouse?",
+    answer("press ctrl + Q on windows and cmd + Q on mac",
+      message = 'this is how you exit Rstudio'),
+    answer("press ctrl + enter",
+      message = 'this would just run the current line of code'),
+    answer("highlight the code and click 'run'",
+      message = 'no clicking allowed, but yes, this will do it'),
+    answer("highlight the code and press ctrl + enter",
+      correct = TRUE,
+      message = 'This is the most useful keyboard shortcut!')
+    ),
+  question("How do you comment out a line of text in an R script?",
+    answer("`>>`"),
+    answer("`comment`"),
+    answer("`#`", correct = TRUE),
+    answer("`*`"),
+    message = paste("Comments make everyone who reads your code happy,",
+    "most importantly your future self who has no idea what your current",
+    "self was doing."),
+    incorrect = 'try again!',
+    allow_retry = TRUE
+  )
+)
+
+```
+
+## Install Packages
+
+### How to install R packages
+
+![](https://vimeo.com/203516241)
+
+The open-source design of R allows anyone to create an R package and share it with the world. This is both a strength and weakness of R. Whatever analysis you need to run, there's probably a package to help you get it done (great!). However, the package may or may not be clearly documented and bug-free (less great). 
+
+**Tangent.** A common myth about R is that the Food and Drug Administration (FDA) won't allow its use for any research. In fact, the FDA uses R heavily and you can see a full presentation about how it is used [here](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/Using-R-in-a-regulatory-environment-FDA-experiences). I don't require you to view this, but you definitely should if you are interested in clinical trials and wonder if R can b more useful for you in that setting.
+
+### Test your knowledge
+
+```{r names}
+quiz(
+  caption = "Quiz - Working with Packages",
+  question("What command do you use to install packages?",
+    answer("`library()`", message = "We will see what `library()` does later."),
+    answer("`install.packages()`", correct = TRUE),
+    answer("`install_packages()`"),
+    answer("There is no command. You must visit [cran.r-project.org](http://cran.r-project.org) and download packages manually.", message = "R makes it easy to download packages. You connect to the internet and then run one of the commands above."),
+    allow_retry = TRUE
+  ),
+  question("Which of these commands will successfully install the magrittr package?",
+    answer("`library(magrittr)`"),
+    answer("`install.packages(magrittr)`"),
+    answer("`install.packages(\"magrittr\")`", correct = TRUE),
+    answer("`import magrittr`"),
+    message = "the install.packages() function only works as intended when you surround the package name with quotations. Notably, the library() function works when you do or do not surround package names with quotes.",
+    allow_retry = TRUE
+  ),
+  question("How often do you need to install a package on your computer?",
+    answer("Every time you restart R"),
+    answer("Every time you restart your computer"),
+    answer("Only once. Afterwards, R can find it on your hard drive as needed.", correct = TRUE),
+    answer("Never, as long as you are connected to the internet.", message = "This could be true if you are using R over a cloud service. However, if you are using R locally on your own computer, you will need to install each package that you use on your computer."),
+    allow_retry = TRUE
+  ),
+  question("What is the tidyverse?",
+    answer("A collection of packages that work well together and provide tools for common data science tasks.", correct = TRUE, message = 'You can install all of the tidyverse packages at once with `install.packages("tidyverse")`.'),
+    answer("A word processing program for R"),
+    answer("A code style that reads like poetry"),
+    answer("An alternate universe where everyone is an R programmer."),
+    allow_retry = TRUE
+  )
+)
+
+```
+
+## Github account
+
+You will need to create a GitHub account in order to interact with me and your peers on the BST 680 [community repository](https://github.com/UAB-BST-680/community). The video below can walk you through how to create your GitHub account.  
+
+![](https://www.youtube.com/watch?v=2NxsjFtGjBA)
+
+For this course, you don't have to use git for version control. It is okay if you just use GitHub to interact and don't want to experiment with version control. However, speaking from my own experiences, I highly recommend learning how to use git with GitHub to manage your work. GitHub offers plenty of online tutorials to make this easy.

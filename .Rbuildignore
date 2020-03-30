@@ -1,3 +1,5 @@
 ^bst680\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^inst/tutorials/01_install\.Rmd$
+^inst/tutorials/02_vectors\.Rmd$

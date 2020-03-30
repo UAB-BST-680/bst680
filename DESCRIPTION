@@ -1,13 +1,22 @@
 Package: bst680
-Title: What the Package Does (One Line, Title Case)
+Title: Tutorials for my Intro to R class
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Authors@R: person(given = "Byron",
+       family = "Jaeger",
+       role = c("aut", "cre"),
+       email = "bcjaeger@uab.edu",
+       comment = c(ORCID = "0000-0001-7399-2299"))
+Description: The tutorials in this package supplement my R course.
+  My students can access these tutorials to learn new materials.
+  Apart from general tutorials (e.g., how to install R), each tutorials 
+  is designed to mirror one programming topic covered in the course.
+Maintainer: Byron Jaeger <bcjaeger@uab.edu>
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/UAB-BST-680/bst680
+BugReports: https://github.com/UAB-BST-680/bst680/issues
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.0.2
+Suggests: 
+    learnr

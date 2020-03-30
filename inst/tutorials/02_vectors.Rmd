@@ -1,0 +1,2269 @@
+---
+title: "Vectors"
+output: 
+  learnr::tutorial:
+   progressive: true
+   allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+
+library(learnr)
+knitr::opts_chunk$set(echo = TRUE)
+learnr::tutorial_options(exercise.completion = FALSE)
+
+```
+
+## Disclaimer
+
+The content of this tutorial draws heavily on the following sources:
+
+- [R4DS by Garrett Grolemund & Hadley Wickham](https://r4ds.had.co.nz/)
+
+- [Advanced R by Hadley Wickham](https://adv-r.hadley.nz/index.html#license)
+
+Before you proceed with this tutorial, make sure you have completed the
+following Rstudio primers:
+
+1. [The basics](https://rstudio.cloud/learn/primers/1)
+
+## Introduction
+
+This is the second tutorial in a series that I have created to help 
+you learn more about R. Let's start with a loose definiton: 
+
+### What is R?
+
+In short, R is a programming language for data analysis.
+
+Data analysis is largely conducted using __vectors__, the primary 
+topic of this tutorial. I think of vectors as containers for data. 
+In R, there are four primary types of data: 
+
+- logical (true and false values), 
+
+- integer (whole numbers), 
+
+- double (real numbers) 
+
+- character (which contains strings). 
+
+If a vector only has one type of data, it is called __atomic__. 
+Vectors with multiple types of data are called recursive vectors, 
+or __lists__.
+
+```{r, echo = FALSE, out.width = '80%'}
+knitr::include_graphics("images/data-structures-overview.png")
+```
+
+### Syntax
+
+Each of the four primary types has a special syntax to create an 
+individual value, also known as a __scalar__:
+
+- Logicals can be written in full as `TRUE` or `FALSE`, 
+  or abbreviated as `T` or `F`.
+
+- Doubles can be specified in decimal (`0.1234`), scientific (`1.23e4`). 
+  There are three special values unique to doubles: `Inf`, `-Inf`, and `NaN` 
+  (not a number). 
+
+- Integers are written similarly to doubles but must be followed by 
+  `L` (e.g., `1234L`, `1e4L`, or `0xcafeL`), and can not contain
+  fractional values. 
+
+- Strings are surrounded by `"` (`"hi"`) or `'` (`'bye'`). Special characters
+  are escaped with `\`; see `?Quotes` for full details.
+
+### L for integers?
+
+`L` is not intuitive, and you might wonder where it comes from. At the time `L` was added to R, R's integer type was equivalent to a long integer in C, and C code could use a suffix of `l` or `L` to force a number to be a long integer. It was decided that `l` was too visually similar to `i` (used for complex numbers in R), leaving `L`.
+
+### What are scalars?
+
+A scalar value is a constant, such as `1`. Technically, the R language does not possess scalars. Everything that looks like a scalar is actually a vector of length one. 
+
+```{r type_questions, echo = FALSE}
+
+quiz(
+  question(
+    "What type of value is this? '1' ",
+    answer("a character", correct = TRUE),
+    answer("a numeric", message = 'what are the things surrounding 1?'),
+    answer("a logical"),
+    answer("an integer", message = 'what are the things surrounding 1?'),
+    allow_retry = TRUE
+  ),
+    question(
+    "What type of value is this? 1L",
+    answer("an integer", correct = TRUE),
+    answer("a numeric", message = 'can you be more specific?'),
+    answer("a logical"),
+    answer("a double"),
+    allow_retry = TRUE
+  ),
+  question(
+    "What type of value is this? 1.5",
+    answer("an integer", message = 'integers cannot be fractions.'),
+    answer("a double", correct = TRUE),
+    answer("a logical"),
+    allow_retry = TRUE
+  )
+)
+
+```
+
+## Review
+
+Before going further, make sure you are comfortable with some core 
+mechanics in R.
+
+### Save values to objects
+
+In R, you can save values to objects and ten access objects in subsequent
+commands. For example, I made myself a strong drink before I started working on this. In R, my drink could be saved as an object in my global environment like so: 
+
+```{r, eval=FALSE}
+
+my_drink <- new_beverage(type = 'strong')
+
+```
+
+I could use the drink to update another object, such as myself, 
+by taking a sip from the drink.
+
+```{r, eval = FALSE}
+
+byron <- byron + sip(from = my_drink)
+
+```
+
+Note how the object `byron` is modified by the line of code above. This 
+syntax is used to make a new version of `byron` that will overwrite 
+the existing version. 
+
+### Your turn
+
+- An object called `a` has been created for you below.
+
+- Try creating an object, call it `b`, with a value of `a + 5`
+
+- Print `b` by typing `b` or `print(b)` in the last line of the code block.
+
+```{r make-b, exercise=TRUE, exercise.eval = TRUE}
+
+a <- 2
+
+```
+
+```{r make-b-hint-1}
+
+b <- a + 5
+
+```
+
+```{r make-b-hint-2}
+
+# to print an object
+# run the object in your console
+
+b
+
+```
+
+```{r make-b-solution}
+
+a <- 2
+b <- a + 5
+b
+
+```
+
+## Atomic vectors
+
+A lot of the analysis we do in R can be boiled down to atomic vectors. 
+
+### Creating atomic vectors
+
+To create an atomic vector manually, use the `c()` function.
+The `c()` is short for combine, concatenate, and coerce, 
+depending on how it is used. In the examples below, `c()`
+is being used to _combine_ values into a single atomic vector.
+
+```{r}
+
+lgl_var <- c(TRUE, FALSE) # logical = lgl
+int_var <- c(1L, 6L, 10L) # integer = int
+dbl_var <- c(1, 2.5, 4.5) # double = dbl
+chr_var <- c("these are", "some strings") # character = chr
+
+```
+
+In diagrams, I'll depict vectors as connected rectangles, 
+so the above code could be drawn as follows:
+
+```{r, echo = FALSE, out.width = '100%'}
+knitr::include_graphics("images/atomic.png")
+```
+
+When the inputs of `c()` are atomic vectors, 
+`c()` _concatenates_ these vectors into a single atomic vector like so:
+
+```{r}
+
+# two vectors become one
+c(c(1, 2), c(3, 4))
+
+```
+
+### Use `c()` 
+
+The vectors `a` and `b` are given.
+Concatenate them into a single vector, 
+with the values of `a` occurring before the values of `b`. 
+
+```{r first-c, exercise = TRUE, exercise.eval = TRUE}
+
+a <- c(1,2,3)
+b <- c(4,5,6)
+
+```
+
+```{r first-c-hint}
+
+# try this
+c(a, b)
+
+```
+
+```{r first-c-solution}
+
+a <- c(1,2,3)
+b <- c(4,5,6)
+c(a,b)
+
+```
+
+### Sequences
+
+What if we need to make larger, patterned vectors?
+(You probably don't want to write thousands of numbers with `c()`.)
+
+Instead, use `:` like so.
+
+```{r, echo=TRUE}
+
+1:10
+
+```
+
+How about sequences of negative numbers?
+This takes a little bit of additional thinking.
+
+```{r}
+
+# Incorrect! we didn't get the sequence we wanted
+-1:3
+
+# Good, not great. The code is a little hard to read
+# (It also looks too much like a face).
+
+-1:-3
+
+# Great. Commands inside of () are executed first.
+# and the - sign is applied second.
+-(1:3)
+
+```
+
+### The `seq()` function
+
+The `seq()` function allows you to make more specific sequences.
+For example, we might want to make a sequence of length 5 from 0 to 1,
+with equal space between each value in the sequence.
+
+```{r, echo=TRUE}
+
+seq(from = 0, to = 1, length.out = 5)
+
+```
+
+Or maybe a sequence from 2 to 10, taking steps of 2 along the way.
+
+```{r}
+
+seq(from = 2, to = 10, by = 2)
+
+```
+
+### Use `seq()`
+
+Add the following vectors together, and print the result.
+
+- A numeric vector containing the values 1, 2, ..., 5
+- A numeric vector containing 5 values from 0 to 1, equally spaced.
+
+
+```{r first-seq, exercise = TRUE}
+
+
+```
+
+```{r first-seq-hint-1}
+
+1:5
+
+```
+
+```{r first-seq-hint-2}
+
+seq(0,1, length.out = 5)
+
+```
+
+
+```{r first-seq-solution}
+
+1:5 + seq(0,1, length.out = 5)
+
+```
+
+### Scalars and recycling rules
+
+Does R add vectors together if one vector isn't the same length as the other?
+
+Yes. 
+
+```{r}
+1:10 + 1
+```
+
+This is called vector __recycling__ because the shorter vector is repeated, 
+or recycled, until it is the same length as the longer vector. 
+
+
+*Should* R do this? 
+
+Sometimes. While vector recycling can be used to create very succinct, 
+clever code, it can also silently conceal problems. Namely, when vectors
+are supposed to be same length but aren't (because data collection is hard),
+the best thing R can do is yell at you and let you know that there is a 
+problem with the vectors. However, R will only yell at you when the length 
+of the longer vector is not an integer multiple of the length of the 
+shorter vector. Here is an example where R gives an explicit warning:
+
+```{r}
+
+1:10 + 1:3
+
+```
+
+On the other hand, this operation runs quietly. (Why?)
+
+```{r}
+
+1:10 + 1:2
+
+```
+
+Some package developers are so adamant about avoiding recycling that they
+hard-code their functions to be recycling intolerant. For example:
+
+```{r, error = TRUE}
+
+# base R lets you make data objects with recycled vectors:
+
+df = data.frame(
+  a = 1:10,
+  b = 1:2
+)
+
+# but the tidyverse data objects (i.e., tibbles) do not
+library(tibble)
+
+df = tibble(
+  a = 1:10,
+  b = 1:2
+)
+
+```
+
+I recommend avoiding recycling entirely except when one vector is a scalar 
+(i.e., a constant). If you really want to handle vectors with inconsistent 
+length, the next section will teach you how to do so systematically and
+intentionally with the `rep()` function.
+
+```{r recycle-questions, echo = FALSE}
+
+quiz(
+  question(
+    "Suppose x = 1:3 and y = 1:2. What will be the third value of x+y?",
+    answer("1 + 1 = 2", 
+           message = "Read my recommendation on recycling one more time."),
+    answer("There won't be a third value of x+y because I only recycle scalars",
+           correct = TRUE),
+    answer("4"),
+    allow_retry = TRUE
+  )
+)
+
+```
+
+### Repeating
+
+The `rep()` function (short for replicate or repeat) 
+helps to make patterned vectors with repetition. For example,
+
+```{r}
+
+# repeat the value of 1 ten times
+rep(x = 1, times = 10)
+
+# repeat each value 5 times
+rep(x = c(1,2), each = 5)
+
+# repeat the first value 3 times, the second 1 time
+rep(x = c(1,2), times = c(3,1))
+
+# repeat an entire vector 5 times
+rep(x = c(1,2), times = 5)
+
+```
+
+### Use `rep()` 
+
+Repeat each letter in the alphabet a number of times equal to its position 
+in the alphabet. In other words, `'a'` is repeated one time, 
+`'b'` is repeated two times, and so on until 
+`'z'` is repeated 26 times. 
+
+Note that R has a pre-made vector called `letters` which contains the letters
+`'a'` through `'z'` in alphabetical order. The `letters` vector and the upper 
+case `LETTERS` vector are both available in your R workspace by default.
+
+```{r rep_alphabet, exercise = TRUE, exercise.eval = TRUE}
+
+x <- letters
+print(x)
+
+```
+
+```{r rep_alphabet-hint-1}
+
+x <- letters
+
+# x has 26 values in it
+rep(x, times = 1:26)
+
+```
+
+```{r rep_alphabet-solution}
+
+x <- letters
+rep(x, times = 1:26)
+
+```
+
+### Vector operations
+
+Numeric operations for vectors are set up as follows:
+
+- `+` Addition
+- `-` Subtraction
+- `*` Multiplication
+- `^` Exponentiation
+- `/` Division
+
+Just like math class, the order of operations in R is: 
+
+1. Parentheses,
+2. Exponents, 
+3. Multiplication and Division, 
+4. Addition and Subtraction
+
+### Use math! 
+
+The vectors `x` and `y` are created for you below. 
+
+- Divide `x` by `y`
+- Raise the resulting vector to the power of -1.
+- Multiply the resulting vector by 10
+- Subtract 1 from the resulting vector
+- Print the result.
+
+```{r operations, exercise = TRUE, exercise.eval = TRUE}
+
+x <- 1:10
+y <- 10:1
+
+```
+
+```{r operations-hint}
+
+# complete this expression
+# (x/y)^(-1) * ??? - ???
+
+```
+
+```{r operations-solution}
+
+(x/y)^(-1) * 10 - 1
+
+```
+
+### Summary functions
+
+Numeric vectors normally contain data that analysts want to summarize.
+Most summary functions in R have straightforward names and outputs.
+
+- `mean()` takes the mean of a vector.
+- `sd()` takes the standard deviation of a vector.
+- `median()` takes the median of a vector.
+- `sum()` takes the sum of a vector.
+- `length()` counts the number of items in a vector.
+- `table()` counts the frequency of all unique values in a vector.
+
+Here is an example showing how these functions can be used:
+
+```{r}
+
+x <- 1:100
+
+# compute the mean semi-manually
+sum(x) / length(x)
+
+# use the built in function
+mean(x)
+
+```
+
+### Compute a median
+
+Print the median of the given vector.
+
+```{r median, exercise = TRUE}
+
+x <- 1:5000
+
+```
+
+```{r median-solution}
+
+x <- 1:5000
+median(x)
+
+```
+
+### Compute standard error
+
+The standard error of a vector of numeric values is given by 
+$$\frac{\text{sd}(x)}{\sqrt{n}}.$$
+where $sd(x)$ is the standard deviation of $x$ and $n$ is the number of values (i.e., the `length`) in $x$. 
+
+```{r std_err, exercise = TRUE, exercise.eval = TRUE}
+
+x <- 1:5000
+
+```
+
+```{r std_err-hint-1}
+
+sd(x)
+
+```
+
+```{r std_err-hint-2}
+
+sqrt(length(x))
+
+```
+
+```{r std_err-solution}
+
+x <- 1:5000
+sd(x) / sqrt(length(x))
+
+```
+
+### Logical vectors
+
+Numeric values can be any real number, but Logical values must be 
+either `TRUE` or `FALSE`. R evaluated logical values with operations
+similar to numeric values, but with some additional symbols that 
+allow you to engage with logical structures.
+
+The following diagram should clarify some of R's logical rules. In the diagram,
+`x` is the circle on the left and `y` is the circle on the right. The 
+overlapping region of `x` and `y` indicates a situation where both `x` and `y`
+are `TRUE`. Non-overlapping regions indicate scenarios where only one of `x`
+and `y` are `TRUE`.
+
+```{r, echo = FALSE, out.width = '100%'}
+
+knitr::include_graphics("images/transform-logical.png")
+
+```
+
+Logical statement examples are given below:
+
+```{r, echo = TRUE}
+
+# 5 is greater than 1, so this statement is true
+true_condition <- 5 > 1
+
+true_condition
+
+# 5 is less than 10, so this is false
+false_condition <- 5 > 10
+
+false_condition
+
+# The logical and (a & symbol) is true only if both conditions are true
+
+true_condition & false_condition
+
+# The logical or (a | symbol) is true if just one condition is true
+
+true_condition | false_condition
+
+```
+
+Logical operations can also be applied to logical vectors. For example,
+
+```{r}
+
+# the ! operator negates logical values, 
+# i.e. TRUE -> FALSE, and vice versa.
+
+x <- c(TRUE, FALSE, FALSE)
+
+# negate the values of x
+!x
+
+# the logical and operator (&) will do pairwise comparisons
+y <- c(TRUE, TRUE, FALSE)
+
+x & y
+
+# as will the logical or operator (|)
+
+x | y
+
+```
+
+### Use logic
+
+```{r logic_quiz}
+
+quiz(
+  question(
+    "Which of the following conditions are `TRUE`?",
+    answer('5 > 10'),
+    answer('!(5 > 10)', correct = TRUE),
+    answer('!(5 > 10) & !(10 > 5)'),
+    answer('!(5 > 10) | !(10 > 5)', correct = TRUE),
+    answer('!(5 > 10) | !(10 > 5) | (5 < 10)', correct = TRUE),
+    allow_retry = TRUE
+  )
+)
+
+```
+
+
+### Character vectors
+
+Character values in R represent strings, which are surrounded by 
+`"` (`"hi"`) or `'` (`'bye'`). You can create strings with either 
+single quotes or double quotes. Unlike other languages, there is no 
+difference in behaviour. I recommend always using `"`, unless you 
+want to create a string that contains multiple `"`.
+
+```{r}
+string1 <- "This is a string"
+string2 <- 'If I want to include a "quote" inside a string, I use single quotes'
+```
+
+If you forget to close a quote, you'll see `+`, the continuation character:
+
+```
+> "This is a string without a closing quote
++ 
++ 
++ HELP I'M STUCK
+```
+
+If this happen to you, press Escape and try again!
+
+To include a literal single or double quote in a string you can use `\` to "escape" it:
+
+```{r}
+double_quote <- "\"" # or '"'
+single_quote <- '\'' # or "'"
+```
+
+That means if you want to include a literal backslash, you'll need to double it up: `"\\"`.
+
+Beware that the printed representation of a string is not the same as string itself, because the printed representation shows the escapes. To see the raw contents of the string, use `writeLines()`:
+
+```{r}
+x <- c("\"", "\\")
+x
+writeLines(x)
+```
+
+There are a handful of other special characters. The most common are `"\n"`, newline, and `"\t"`, tab, but you can see the complete list by requesting help on `"`: `?'"'`, or `?"'"`. You'll also sometimes see strings like `"\u00b5"`, this is a way of writing non-English characters that works on all platforms:
+
+```{r}
+x <- "\u00b5"
+x
+```
+
+Multiple strings are often stored in a character vector, which you can create 
+with `c()`: The `table()` function is particularly useful to summarize vectors 
+of strings: 
+
+```{r}
+
+chr_vec <- c('a','a','b','a','b')
+
+table(chr_vec)
+
+```
+
+As you can see, `table()` counts how many times each value in a vector
+occurs, and then places that count beneath the value in printed output.
+Since the string `'a'` appears three times in `chr_vec`, the number 3
+is printed below the letter `a` in the printed output. We can get this
+number using another approach based on a logical vector.
+
+```{r}
+
+# create a logical vector that is TRUE when chr_vec == 'a'
+lgl_vec <- chr_vec == 'a'
+
+# take the sum of the vector
+sum(lgl_vec)
+
+```
+
+
+Logical values can also be converted to numerics using `as.numeric()`:
+
+- `TRUE` is coerced to a value of 1.
+- `FALSE` is coerced to a value of 0.
+
+Here is an example:
+
+```{r, echo = TRUE}
+
+x = TRUE
+y = FALSE
+
+# logical statement 
+x | y
+
+# coerced into a numeric
+as.numeric(x | y)
+
+```
+
+R may also coerce logical to numeric values without telling you. 
+For example, if you pass a logical vector to a function that 
+requires numeric inputs (e.g, `sum()`):
+
+```{r, echo = TRUE}
+
+x <- c(TRUE, TRUE, FALSE, FALSE)
+
+# x will be converted to numeric.
+# the two TRUE values in x are converted to 1, 
+# i.e., c(1,1,0,0). The sum of this is 2! 
+
+sum(x)
+
+# same thing as
+sum(as.numeric(x))
+
+```
+
+### `strings` and `glue()`
+
+Operations like `+` and `-` do not apply to character values in R, 
+but there are some fairly straightforward alternatives that make it easy
+to work with character values. My favorite is the `glue()` function. 
+Here is an example showing how `glue()` works.
+
+```{r}
+
+# glue comes from the glue package.
+library(glue)
+
+name <- "Byron"
+mood <- "morose"
+reason <- "I am on a plane"
+
+glue("Hello! My name is {name}. I am {mood} because {reason}")
+
+```
+
+String values can be passed into glue with character values wrapped in 
+the curly (`{}`) symbols. When `glue()` sees something inside a curly symbol, 
+it evaluates it as if it were R code. That is why I saved three variables to 
+my R environment before I called `glue()`. 
+
+### Quiz
+
+Suppose the mean systolic blood pressure in a sample of 100 participants is 120 mm Hg and the standard deviation of systolic blood pressure in this population is 20. 
+
+```{r standard-error-question, echo = FALSE}
+
+quiz(
+  question(
+    "What is the standard error for the mean systolic blood pressure from our sample?",
+    answer("Nothing. The mean is constant.", 
+           message = 'The population mean is constant, the sample mean is not.'),
+    answer("3"),
+    answer("2", correct = T),
+    answer("None of the above"),
+    allow_retry = TRUE
+  )
+)
+
+```
+
+###  Use `glue()` 
+
+Show a 2 standard error interval for mean systolic blood pressure in our sample. 
+Your answer should be a string of the form `mean (lower, upper)`.
+Specifically, lower = mean systolic blood pressure minus two standard errors.
+Similarly, upper = mean systolic blood pressure plus two standard errors.
+
+```{r glue_ci, exercise = TRUE, eval=TRUE}
+
+library(glue)
+
+sample_mean <- 120
+sample_stderr <- 2
+
+lower <- sample_mean - 2 * sample_stderr
+# upper <- ?
+
+
+```
+
+```{r glue_ci-solution}
+
+library(glue)
+
+sample_mean <- 120
+sample_stderr <- 2
+lower <- sample_mean - 2 * sample_stderr
+upper <- sample_mean + 2 * sample_stderr
+
+glue("{sample_mean} ({lower}, {upper})")
+
+```
+
+## Missing values
+
+R represents missing values using `NA` (short for not applicable). 
+Missing values tend to be infectious: most computations involving a missing value will return another missing value. For example,
+
+```{r}
+
+NA > 5
+
+10 * NA
+
+!NA
+
+1 + NA
+
+```
+
+There are only a few exceptions to this rule. These occur when some identity holds for all possible inputs:
+
+```{r}
+NA ^ 0
+NA | TRUE
+NA & FALSE
+```
+
+Propagation of missingness leads to a common mistake when determining which values in a vector are missing:
+
+```{r}
+
+x <- c(NA, 5, NA, 10)
+
+x == NA
+
+```
+
+This result is correct (if a little surprising) because there's no reason to believe that one missing value has the same value as another. Instead, use `is.na()` to test for the presence of missingness:
+
+```{r}
+
+is.na(x)
+
+```
+
+Technically there are four missing values, one for each of the atomic types: `NA` (logical), `NA_integer_` (integer), `NA_real_` (double), and `NA_character_` (character). This distinction is usually unimportant because `NA` will be automatically coerced to the correct type when needed.
+
+### Quiz
+
+```{r miss-dat-question, echo = FALSE}
+
+quiz(
+  question(
+    "What is (NA + 1)^0 ?",
+    answer("1", message = 'close, look at the other answers'),
+    answer("NA"),
+    answer("NA after evaluating the code inside of (), then 1", 
+           correct = T),
+    answer("1 after evaluating the code inside of (), then NA"),
+    allow_retry = TRUE
+  )
+)
+
+```
+
+## Attributes 
+
+You might have noticed that the set of atomic vectors does not include some 
+important data structures like matrices, arrays, factors, or date-times. 
+These types are built on top of atomic vectors by adding __attributes__. 
+Specifically, the `dim` attribute defines matrices and arrays and the `class` attribute is used to create factors, dates, and date-times.
+
+Think of attributes as name-value pairs that attach metadata to an object. Individual attributes can be retrieved and modified with `attr()`, 
+or retrieved en masse with `attributes()`, and set en masse with 
+`structure()`. Here are some examples.
+
+```{r}
+
+# create a vector a with integer data 1, 2, and 3
+a <- 1:3
+# add an attribute to a, called x, with a value of 'abdef'
+attr(a, "x") <- "abcdef"
+# print this attribute
+attr(a, "x")
+# print the structure of a. 
+str(a)
+
+```
+
+Notice how the attribute `x` in the example above is a character vector? 
+It may seem like we have broken the atomic vector rules by attaching a
+character vector to an integer vector, but in fact we haven't modified any
+of the integer data stored in `a`. Instead, we have attached a vector 
+`x` to `a`. This is a useful operation if `x` helps to describe `a` (in 
+this case it doesn't). Here is another example.
+
+```{r}
+
+# add another attribute to a
+attr(a, "y") <- 4:6
+# print all the attributes of a
+attributes(a)
+
+# Equivalently, create a vector
+# with the same attributes using structure().
+a <- structure(
+  .Data = 1:3, 
+  x = "abcdef",
+  y = 4:6
+)
+str(attributes(a))
+
+```
+
+In the diagram below, the attributes of `x` are placed in the dark section
+appended to the right side of the vector.
+
+```{r, echo = FALSE, out.width = NULL}
+
+knitr::include_graphics("images/attr.png")
+
+```
+
+### Get an attribute
+
+The vector `x` is given below.
+
+- Print the `job` attribute of `x`
+
+```{r get_attr, exercise = TRUE, exercise.eval = TRUE}
+
+x <- structure(
+  .Data = "byron", 
+  job = "assistant professor",
+  promoted = FALSE
+)
+
+```
+
+```{r get_attr_hint}
+
+attr(x, 'job')
+
+```
+
+
+```{r get_attr-solution}
+
+x <- structure(
+  .Data = "byron", 
+  job = "assistant professor",
+  promoted = FALSE
+)
+
+attr(x, 'job')
+
+```
+
+### Set attributes
+
+The vector `x` is given below. Promote me by 
+
+- changing my job attribute to `'associate professor'`
+- changing my promoted status to `TRUE`
+- Print the newly adorned `x` vector.
+
+```{r set_attr, exercise = TRUE, exercise.eval = TRUE}
+
+x <- structure(
+  .Data = "byron", 
+  job = "assistant professor",
+  promoted = FALSE
+)
+
+```
+
+```{r set_attr-solution}
+
+x <- structure(
+  .Data = "byron", 
+  job = "assistant professor",
+  promoted = FALSE
+)
+
+attr(x, 'job') <- "associate professor"
+attr(x, 'promoted') <- TRUE
+
+x
+
+```
+
+### Permanent attributes
+
+Attributes should generally be thought of as ephemeral. 
+For example, most attributes are lost by most operations:
+
+```{r}
+
+a <- structure(
+  .Data = 1:3, 
+  x = "abcdef",
+  y = 4:6
+)
+
+# attributes are here
+attributes(a)
+
+# and they're gone!
+attributes(sum(a))
+
+```
+
+There are only two attributes that are routinely preserved: 
+
+- __names__, a character vector giving each element a name.
+- __dim__, short for dimensions, an integer vector, 
+  used to turn vectors into matrices or arrays.
+
+To preserve other attributes, you'll need to create your own S3 class, 
+a topic that may be covered in more detail later on in this tutorial.
+
+### Names 
+
+You can name a vector in three ways:
+
+```{r}
+# When creating it: 
+x <- c(a = 1, b = 2, c = 3)
+
+# By assigning a character vector to names()
+x <- 1:3
+names(x) <- c("a", "b", "c")
+
+# Inline, with setNames():
+x <- setNames(1:3, c("a", "b", "c"))
+```
+
+Avoid using `attr(x, "names")` as it requires more typing and is less 
+readable than `names(x)`. You can remove names from a vector by using 
+`unname(x)` or `names(x) <- NULL`. 
+
+To be technically correct, when drawing the named vector `x`, 
+I should draw it like so:
+
+```{r, echo = FALSE, out.width = NULL}
+knitr::include_graphics("images/attr-names-1.png")
+```
+
+However, names are so special and so important, that unless I'm trying 
+specifically to draw attention to the attributes data structure, I'll use 
+them to label the vector directly:
+
+```{r, echo = FALSE, out.width = NULL}
+knitr::include_graphics("images/attr-names-2.png")
+```
+
+To be useful with character subsetting, the names of a vector should be unique
+and non-missing. Notably, R does not enforce this. Depending on how the names 
+are set, missing names may be either `""` or `NA_character_`. If all names are
+missing, `names()` will return `NULL`.
+
+### Name it!
+
+Create a named character vector with 
+
+- data: `'Game of Thrones'`, `'Lord of the Rings'`, `'The Witcher'`
+
+- names: `'ruined by the last season'`, `'a true epic'`, `'the best show ever'`
+
+- attributes: 
+
+    + `these_are_facts` should be a `TRUE` value
+    
+    + `great_exercise` should also be set to `TRUE`
+    
+
+```{r make_attrs, exercise = TRUE}
+
+```
+
+```{r make_attrs-solution}
+
+x <- structure(
+  .Data = c('Game of Thrones', 'Lord of the Rings', 'The Witcher'),
+  these_are_facts = TRUE,
+  great_exercise = TRUE
+)
+
+names(x) <- c(
+  'ruined by the last season', 
+  'a true epic', 
+  'the best show ever'
+)
+
+x
+
+```
+
+### Dimensions 
+
+Adding a `dim` attribute to a vector allows it to behave like a 2-dimensional
+__matrix__ or a multi-dimensional __array__. Matrices and arrays are primarily
+mathematical and statistical tools, not programming tools, so they'll be used
+infrequently and only covered briefly in this tutorial.
+
+You can create matrices and arrays with `matrix()` and `array()`, or by using 
+the assignment form of `dim()`:
+
+```{r}
+# Two scalar arguments specify row and column sizes
+a <- matrix(1:6, nrow = 2, ncol = 3)
+a
+
+# One vector argument to describe all dimensions
+b <- array(1:12, c(2, 3, 2))
+b
+
+# You can also modify an object in place by setting dim()
+c <- 1:6
+dim(c) <- c(3, 2)
+c
+```
+
+Many of the functions for working with vectors have generalisations for 
+matrices and arrays:
+
+| Vector            | Matrix                     | Array            |
+|-------------------|----------------------------|------------------|
+| `names()`         | `rownames()`, `colnames()` | `dimnames()`     |
+| `length()`        | `nrow()`, `ncol()`         | `dim()`          |
+| `c()`             | `rbind()`, `cbind()`       | `abind::abind()` |
+| ---               | `t()`                      | `aperm()`        |
+| `is.null(dim(x))` | `is.matrix()`              | `is.array()`     |
+
+
+A vector without a `dim` attribute set is often thought of as 1-dimensional, 
+but actually has `NULL` dimensions. You also can have matrices with a single 
+row or single column, or arrays with a single dimension. They may print 
+similarly, but will behave differently. The differences aren't too important,
+but it's useful to know they exist in case you get strange output from a 
+function (`tapply()` is a frequent offender). As always, use `str()` to reveal 
+the differences.
+
+```{r}
+str(1:3)                   # 1d vector
+str(matrix(1:3, ncol = 1)) # column vector
+str(matrix(1:3, nrow = 1)) # row vector
+str(array(1:3, 3))         # "array" vector
+```
+
+### Make a matrix
+
+Create a matrix that has 100 rows and 100 columns. Create your matrix so that
+all vaues in the first column are `1`, all values in the second column contains
+are `2`, and so on until all values in the 100th column are `100`. Also, set
+the column names of the matrix to be the values of `'column_1'`, `'column_2'`,
+..., `'column_100'`. 
+
+```{r make_matrix, exercise = TRUE}
+
+```
+
+
+```{r make_matrix-hint-1}
+
+library(glue)
+
+mat <- rep(1:100, each = 100)
+
+```
+
+```{r make_matrix-hint-2}
+
+library(glue)
+
+mat <- rep(1:100, each = 100)
+
+dim(mat) <- c(100, 100)
+
+
+```
+
+```{r make_matrix-hint-3}
+
+library(glue)
+
+mat <- rep(1:100, each = 100)
+
+dim(mat) <- c(100, 100)
+
+colnames(mat) <- glue("column_{1:100}")
+
+```
+
+
+```{r make_matrix-solution}
+
+library(glue)
+
+mat <- rep(1:100, each = 100)
+
+dim(mat) <- c(100, 100)
+
+colnames(mat) <- glue("column_{1:100}")
+
+mat
+
+```
+
+### S3 atomic vectors
+
+One of the most important vector attributes is `class`, which underlies the 
+S3 object system. Having a class attribute turns an object into an 
+__S3 object__, which means it will behave differently from a regular vector 
+when passed to a __generic__ function (e.g., `print()`). 
+
+We won't go into great detail on S3 objects here, but they have deep uses in R. 
+I don't go into the deeper uses here, but you can and should go
+[here](http://adv-r.had.co.nz/S3.html) to learn more.
+
+Every S3 object is built on top of a base type, and often stores additional information in other attributes. 
+
+In this section, we'll discuss four important S3 vectors used in base R:
+
+* Categorical data, where values come from a fixed set of levels recorded in 
+  __factor__ vectors.
+
+* Dates (with day resolution), which are recorded in __Date__ vectors.
+
+* Date-times (with second or sub-second resolution), which are stored in
+  __POSIXct__ vectors.
+  
+* Durations, which are stored in __difftime__ vectors.
+
+```{r, echo = FALSE, out.width = NULL}
+knitr::include_graphics("images/summary-tree-s3-1.png")
+```
+
+### Factors
+ 
+A factor is a vector that can contain only predefined values. It is used to 
+store categorical data. Factors are built on top of an integer vector with 
+two attributes: a `class`, "factor", which makes it behave differently from 
+regular integer vectors, and `levels`, which defines the set of allowed values.
+
+```{r}
+x <- factor(c("a", "b", "b", "a"))
+x
+
+# Note that x has integer type
+typeof(x)
+# and its class attribute is factor
+attributes(x)
+
+```
+
+```{r, echo = FALSE, out.width = NULL}
+knitr::include_graphics("images/factor.png")
+```
+
+Factors are useful when you know the set of possible values but they're not 
+all present in a given dataset. In contrast to a character vector, when you 
+tabulate a factor you'll get counts of all categories, even unobserved ones:
+
+```{r}
+sex_char <- c("m", "m", "m")
+sex_factor <- factor(sex_char, levels = c("m", "f"))
+
+table(sex_char)
+table(sex_factor)
+```
+
+__Ordered__ factors are a minor variation of factors. In general, they behave 
+like regular factors, but the order of the levels is meaningful (low, medium, 
+high) (a property that is automatically leveraged by some modelling and 
+visualisation functions).
+
+```{r}
+
+grade <- ordered(c("b", "b", "a", "c"), levels = c("c", "b", "a"))
+grade
+
+```
+
+In base R you tend to encounter factors very frequently because many base R
+functions (like `read.csv()` and `data.frame()`) automatically convert 
+character vectors to factors. This is suboptimal because there's no way for 
+those functions to know the set of all possible levels or their correct order: 
+the levels are a property of theory or experimental design, not of the data.
+Instead, use the argument `stringsAsFactors = FALSE` to suppress this behaviour, 
+and then manually convert character vectors to factors using your knowledge 
+of the "theoretical" data. To learn about the historical context of this 
+behaviour, I recommend [_stringsAsFactors: An unauthorized
+biography_](http://simplystatistics.org/2015/07/24/stringsasfactors-an-unauthorized-biography/) by Roger Peng, and [_stringsAsFactors = 
+\<sigh\>_](http://notstatschat.tumblr.com/post/124987394001/stringsasfactors-sigh) by Thomas Lumley.
+
+While factors look like (and often behave like) character vectors, they are 
+built on top of integers. So be careful when treating them like strings. 
+Some string methods (like `gsub()` and `grepl()`) will automatically coerce 
+factors to strings,  others (like `nchar()`) will throw an error, and still 
+others will (like `c()`) use the underlying integer values. For this reason, 
+it's usually best to explicitly convert factors to character vectors if you 
+need string-like behaviour.
+
+### Make a factor
+
+The vector `x` is given.
+
+- Turn `x` into a factor using attributs or the `factor()` function. 
+
+- The levels of `x` should be `'a'`, `'b'`, and `'c'`.
+
+```{r make_fctr, exercise = TRUE}
+
+x <- c('a','b','b')
+
+```
+
+
+```{r make_fctr-solution}
+
+factor(x, levels = c('a','b','c'))
+
+```
+
+```{r make_fctr_quiz}
+
+quiz(
+  question(
+    "If I run table(x) using the factor created in the previous exercise, how many categories will be displayed in the output?",
+    answer('1'),
+    answer('2'),
+    answer('3', correct = TRUE),
+    answer('4'),
+    allow_retry = TRUE
+  )
+)
+
+```
+
+
+### Dates
+
+Date vectors are built on top of double vectors. They have class "Date" and no 
+other attributes:
+
+```{r}
+
+today <- Sys.Date()
+
+# Note that the date value is based on a double
+typeof(today)
+
+# and its class of 'Date'
+attributes(today)
+
+```
+
+The value of the double (which can be seen by stripping the class), 
+represents the number of days since 1970-01-01:
+
+```{r}
+
+# 31 days passed from 1970-01-01 to 1970-02-01
+date <- as.Date("1970-02-01")
+# S3 print method for dates
+date
+# underlying data are numeric, so removing the class leaves us with...
+unclass(date)
+
+```
+
+### Your turn
+
+How many days passed between June 26, 1989 and December 24, 2019?
+
+```{r date_exer, exercise = TRUE}
+
+```
+
+```{r date_exer-solution-hint-1}
+
+d1 <- as.Date("1989-06-26")
+
+```
+
+```{r date_exer-solution-hint-2}
+
+d1 <- as.Date("1989-06-26")
+d2 <- as.Date("2019-12-24")
+
+```
+
+```{r date_exer-solution-hint-3}
+
+d1 <- as.Date("1989-06-26")
+d2 <- as.Date("2019-12-24")
+unclass(d2) - unclass(d1)
+
+```
+
+```{r date_exer-solution}
+
+d1 <- as.Date("1989-06-26")
+d2 <- as.Date("2019-12-24")
+unclass(d2) - unclass(d1)
+
+```
+
+
+### Date-times
+
+Base R provides two ways of storing date-time information, 
+
+- `POSIXct`
+
+- `POSIXlt`
+
+"POSIX" is short for __Portable Operating System Interface__, 
+which is a family of cross-platform standards. 
+
+"ct" stands for calendar time,
+
+"lt" stands for local time. 
+
+Here we'll focus on `POSIXct`, because 
+
+1. it's the simplest, 
+2. it's built on top of an atomic vector, 
+3. it's most appropriate for use in data frames. 
+
+`POSIXct` vectors are built on top of double vectors, 
+where the value represents the number of seconds since 1970-01-01.
+
+```{r}
+
+now_ct <- as.POSIXct("2018-08-01 22:00", tz = "UTC")
+now_ct
+
+# This vector is based on doubles
+typeof(now_ct)
+# but adorned with more attributes than standard date values
+attributes(now_ct)
+
+```
+
+The `tzone` attribute controls only how the date-time is formatted; 
+it does not control the instant of time represented by the vector. 
+Note that the time is not printed if it is midnight.
+
+```{r}
+
+structure(now_ct, tzone = "Asia/Tokyo")
+
+structure(now_ct, tzone = "America/New_York")
+
+structure(now_ct, tzone = "Australia/Lord_Howe")
+
+structure(now_ct, tzone = "Europe/Paris")
+
+```
+
+### Durations
+
+Durations, which represent the amount of time between pairs of dates or 
+date-times, are stored in difftimes. Difftimes are built on top of doubles, 
+and have a `units` attribute that determines how the integer should be 
+interpreted:
+
+```{r}
+
+one_week_1 <- as.difftime(1, units = "weeks")
+one_week_1
+
+typeof(one_week_1)
+attributes(one_week_1)
+
+one_week_2 <- as.difftime(7, units = "days")
+one_week_2
+
+typeof(one_week_2)
+attributes(one_week_2)
+
+```
+
+<!-- conda create -n yourenvname python = 3.6.3 -->
+<!-- conda activate yourenvname -->
+<!-- # conda install -c torch -->
+<!-- #  -->
+
+## Subsetting
+
+R uses the `[` operator as a subsetting function for vectors. 
+The `[` operator is called using `x[a]`, where `x` is a vector and `a` is
+another vector used to identify which values of `x` will be included in the 
+subset. For example, 
+
+```{r}
+
+x <- c('a','b','c','d','e')
+
+# print the first value of x
+x[1]
+
+# print x without the first value of x
+x[-1]
+
+# print the first and third value of x
+x[c(1,3)]
+
+```
+
+In general, there are four types of things that you can subset a vector with:
+
+1.  A numeric vector containing only integers. The integers must either be all 
+    positive, all negative, or zero.
+    
+    Subsetting with positive integers keeps the elements at those positions:
+    
+    ```{r}
+    x <- c("one", "two", "three", "four", "five")
+    x[c(3, 2, 5)]
+    ```
+    
+    By repeating a position, you can actually make a longer output than 
+    input:
+    
+    ```{r}
+    x[c(1, 1, 5, 5, 5, 2)]
+    ```
+    
+    Negative values drop the elements at the specified positions:
+    
+    ```{r}
+    x[c(-1, -3, -5)]
+    ```
+    
+    It's an error to mix positive and negative values:
+    
+    ```{r, error = TRUE}
+    x[c(1, -1)]
+    ```
+
+    The error message mentions subsetting with zero, which returns no values:
+    
+    ```{r}
+    x[0]
+    ```
+    
+    This is not useful very often, but it can be helpful if you want to create 
+    unusual data structures to test your functions with.
+  
+2.  Subsetting with a logical vector keeps all values corresponding to a
+    `TRUE` value. This is most often useful in conjunction with the 
+    comparison functions.
+    
+    ```{r}
+    x <- 1:10
+    
+    # All non-missing values of x
+    x[x > 5]
+    
+    # All even values of x
+    # the %% operator is a modulo operator
+    x[x %% 2 == 0]
+    
+    ```
+
+3.  If you have a named vector, you can subset it with a character vector:
+    
+    ```{r}
+    x <- c(abc = 1, def = 2, xyz = 5)
+    x[c("xyz", "def")]
+    ```
+    
+    Like with positive integers, you can also use a character vector to 
+    duplicate individual entries.
+
+4.  The simplest type of subsetting is nothing, `x[]`, which returns the 
+    complete `x`. This is not useful for subsetting vectors, but it is useful
+    when subsetting matrices (and other high dimensional structures) because
+    it lets you select all the rows or all the columns, by leaving that
+    index blank. For example, if `x` is 2d, `x[1, ]` selects the first row and 
+    all the columns, and `x[, -1]` selects all rows and all columns except
+    the first.
+
+There is an important variation of `[` called `[[`. `[[` only ever extracts a 
+single element, and always drops names. It's a good idea to use it whenever you 
+want to make it clear that you're extracting a single item, as in a for loop. 
+The distinction between `[` and `[[` is most important for lists, as we'll see
+shortly.
+    
+To learn more about the applications of subsetting, reading the "Subsetting" chapter of _Advanced R_: <http://adv-r.had.co.nz/Subsetting.html#applications>.
+
+### Use `[`
+
+A named vector `x` is given below. 
+
+Use `[` to select values in `x` that have the names `'a'`, `'b'`, and `'c'`
+
+
+```{r subset_exer, exercise = TRUE, exercise.eval = TRUE}
+
+x <- c(x = -1, y = -2, z = -3, a = 1, b = 2, c = 3)
+
+```
+
+```{r subset_exer-solution}
+
+x <- c(x = -1, y = -2, z = -3, a = 1, b = 2, c = 3)
+x[c('a','b','c')]
+
+```
+
+
+## Type coercion
+
+Generally, you can __test__ if a vector is of a given type with an `is.*()` function, but these functions need to be used with care. `is.logical()`, `is.integer()`, `is.double()`, and `is.character()` do what you might expect: 
+they test if a vector is a character, double, integer, or logical. 
+
+Avoid `is.vector()`, `is.atomic()`, and `is.numeric()` as they don't test 
+if you have a vector, atomic vector, or numeric vector. 
+You'll need to carefully read the documentation to figure out what they do.
+
+### The `str()` function
+
+`str(x)` will print a compact display of the the __structure__ of an object. 
+For example,
+
+```{r}
+
+x <- 1:100
+str(x)
+
+```
+
+The output shows that `x` is an integer vector with 100 values. 
+`str()` also prints the first 10 values of `x` out for inspection.
+It is an extremely useful for debugging and exploring data structures.
+
+Your turn. create a vector containing the numbers -1, -2, ..., -100,
+then print the structure of that vector using the `str()` function.
+
+```{r str_exercise, exercise = TRUE}
+
+```
+
+```{r str_exercise-solution}
+
+str(seq(-1, -100))
+
+```
+
+### Vector types
+
+For atomic vectors, type is a property of the entire vector 
+because all elements in an atomic vector must be the same type. 
+
+If you try to create a vector with more than one type, R will 
+__coerce__ your vector into a single type. For example,
+
+```{r}
+
+# logical + numeric -> numeric
+str(c(FALSE, 5))
+
+# character + numeric -> character
+str(c("5", 5))
+
+```
+
+This coercion follows a fixed priority 
+
+1. character 
+2. double 
+3. integer 
+4. logical.
+
+In other words, combining a logical with a numeric results in a numeric vector,
+and combining any type with a character results in a character vector.
+
+```{r}
+
+str(c("a", 1, FALSE))
+
+```
+
+```{r coercion_questions, echo = FALSE}
+
+quiz(
+  question(
+    "What type of vector is c(1, FALSE, 'a')",
+    answer("logical"),
+    answer("Nothing. R can't make this vector.", 
+           message = 'It can. c() almost never throws an error.'),
+    answer("numeric"),
+    answer("character", correct = T),
+    allow_retry = TRUE
+  )
+)
+
+```
+
+Coercion often happens automatically. Most mathematical functions (`+`, `log`, `abs`, etc.) will coerce to numeric. This coercion is particularly useful for logical vectors because `TRUE` becomes 1 and `FALSE` becomes 0.
+
+```{r}
+x <- c(FALSE, FALSE, TRUE)
+as.numeric(x)
+
+# Total number of TRUEs
+sum(x)
+
+# Proportion that are TRUE
+mean(x)
+```
+
+You can deliberately coerce types by using an `as.*()` function, e.g. 
+`as.logical()`, `as.integer()`, `as.double()`, or `as.character()`. 
+Failed coercion of strings generates a warning and a missing value:
+
+```{r}
+
+as.integer(c("1", "1.5", "a"))
+
+```
+
+### Counting logicals
+
+Use the `sum()` function to count how many `TRUE` values are in `x`
+
+```{r lgl_sum, exercise = TRUE, exercise.eval = TRUE}
+
+# Dont modify this code.
+# make sure to run set.seed(329) before generating x
+# so that you will get the same answer as I do.
+set.seed(329)
+x <- sample(c(TRUE, FALSE), size = 1000, replace = TRUE)
+# Sample is a great function that we will come back to later.
+
+```
+
+```{r lgl_sum-hint-1}
+
+set.seed(329)
+x <- sample(c(TRUE, FALSE), size = 1000, replace = TRUE)
+sum(x)
+
+```
+
+```{r lgl_sum-solution}
+
+set.seed(329)
+x <- sample(c(TRUE, FALSE), size = 1000, replace = TRUE)
+sum(x)
+
+```
+
+### Proportions with logicals
+
+What proportion of values in `x` given below are `FALSE`?
+
+```{r lgl_mean, exercise = TRUE, exercise.eval = TRUE}
+
+# Dont modify this code.
+# make sure to run set.seed(329) before generating x
+set.seed(329)
+x <- sample(c(TRUE, FALSE), size = 1000, replace = TRUE)
+
+
+```
+
+```{r lgl_mean-hint-1}
+
+set.seed(329)
+x <- sample(c(TRUE, FALSE), size = 1000, replace = TRUE)
+mean(!x)
+
+```
+
+```{r lgl_mean-solution}
+
+set.seed(329)
+x <- sample(c(TRUE, FALSE), size = 1000, replace = TRUE)
+mean(!x)
+
+```
+
+### Count the `'b'`s
+
+Count the number of times 'b' occurs in the vector below. You can use 
+`table()` or `sum()`. 
+
+```{r count_bs, exercise = TRUE, exercise.eval = TRUE}
+
+# Do not modify the two lines of code below.
+# make sure to run set.seed(730) before generating chr_vec
+set.seed(730)
+chr_vec <- sample(letters, size = 100, replace=TRUE)
+# Count the number of b's in chr_vec.
+# Write your answer as an expression or a number
+
+
+```
+
+```{r count_bs-hint-1}
+
+# make sure to run set.seed(730) before generating chr_vec
+set.seed(730)
+chr_vec <- sample(letters, size = 100, replace=TRUE)
+sum(chr_vec == 'b')
+
+```
+
+```{r count_bs-solution}
+
+# make sure to run set.seed(730) before generating chr_vec
+set.seed(730)
+chr_vec <- sample(letters, size = 100, replace=TRUE)
+sum(chr_vec == 'b')
+
+```
+
+### Count missings
+
+How many missing values are in the vector created below?
+
+```{r sum_of_miss, exercise = TRUE, exercise.eval = TRUE}
+
+# make sure to run set.seed(329) before generating vec
+set.seed(329)
+vec <- sample(c(TRUE, FALSE, NA), size = 1000, replace = TRUE)
+
+```
+
+
+```{r sum_of_miss-solution}
+
+set.seed(329)
+vec <- sample(c(TRUE, FALSE, NA), size = 1000, replace = TRUE)
+sum(is.na(vec))
+
+```
+
+## Recursive vectors (lists) 
+
+Lists are a step up in complexity from atomic vectors, because lists can 
+contain other lists. This makes them suitable for representing hierarchical
+or tree-like structures. You create a list with `list()`:
+
+```{r}
+x <- list(1, 2, 3)
+x
+```
+
+A very useful tool for working with lists is `str()` because it focusses on 
+the **str**ucture, not the contents.
+
+```{r}
+
+str(x)
+
+x_named <- list(a = 1, b = 2, c = 3)
+str(x_named)
+
+```
+
+Unlike atomic vectors, `list()` can contain a mix of objects:
+
+```{r}
+
+y <- list("a", 1L, 1.5, TRUE)
+str(y)
+
+```
+
+Lists can even contain other lists!
+
+```{r}
+
+z <- list(list(1, 2), list(3, 4))
+str(z)
+
+```
+
+### Visualising lists
+
+To explain more complicated list manipulation functions, it's helpful to have a visual representation of lists. For example, take these three lists:
+
+```{r}
+
+x1 <- list(c(1, 2), c(3, 4))
+x2 <- list(list(1, 2), list(3, 4))
+x3 <- list(1, list(2, list(3)))
+
+```
+
+I'll draw them as follows:
+
+```{r, echo = FALSE, out.width = "75%"}
+
+knitr::include_graphics("images/lists-structure.png")
+
+```
+
+There are three principles:
+
+1.  Lists have rounded corners. Atomic vectors have square corners.
+  
+1.  Children are drawn inside their parent, and have a slightly darker
+    background to make it easier to see  the hierarchy.
+  
+1.  The orientation of the children (i.e. rows or columns) isn't important, 
+    so I'll pick a row or column orientation to either save space or illustrate 
+    an important property in the example.
+
+### Subsetting
+
+There are three ways to subset a list, which I'll illustrate here:
+
+```{r}
+a <- list(a = 1:3, b = "a string", c = pi, d = list(-1, -5))
+```
+
+*   `[` extracts a sub-list. The result will always be a list.
+
+    ```{r}
+    str(a[1:2])
+    str(a[4])
+    ```
+    
+    Like with vectors, you can subset with a logical, integer, or character
+    vector.
+    
+*   `[[` extracts a single component from a list. It removes a level of 
+    hierarchy from the list.
+
+    ```{r}
+    str(a[[1]])
+    str(a[[4]])
+    ```
+
+*   `$` is a shorthand for extracting named elements of a list. It works
+    similarly to `[[` except that you don't need to use quotes.
+    
+    ```{r}
+    a$a
+    a[["a"]]
+    ```
+
+The distinction between `[` and `[[` is really important for lists, because 
+`[[` drills down into the list while `[` returns a new, smaller list. Compare 
+the code and output above with the visual representation below.
+
+```{r lists-subsetting, echo = FALSE, out.width = "75%", fig.cap = "Subsetting a list, visually."}
+knitr::include_graphics("images/lists-subsetting.png")
+```
+
+### Lists of condiments
+
+The difference between `[` and `[[` is very important, but it's easy to get confused. To help you remember, let me show you an unusual pepper shaker.
+
+```{r, echo = FALSE, out.width = "25%"} 
+knitr::include_graphics("images/pepper.jpg")
+```
+
+If this pepper shaker is your list `x`, then, `x[1]` is a pepper shaker containing a single pepper packet:
+
+```{r, echo = FALSE, out.width = "25%"} 
+knitr::include_graphics("images/pepper-1.jpg")
+```
+
+`x[2]` would look the same, but would contain the second packet. `x[1:2]` would be a pepper shaker containing two pepper packets. 
+
+`x[[1]]` is:
+
+```{r, echo = FALSE, out.width = "25%"} 
+knitr::include_graphics("images/pepper-2.jpg")
+```
+
+If you wanted to get the content of the pepper package, you'd need `x[[1]][[1]]`:
+
+```{r, echo = FALSE, out.width = "25%"} 
+knitr::include_graphics("images/pepper-3.jpg")
+```
+
+### Make a list
+
+Create a list with the following things: 
+
+- A numeric vector named `sbp` with values 120, 130, and 140
+
+- A numeric vector named `dbp` with values 70, 80, and 90
+
+- A vector named `person` with values `'Billy'`, `'Bonny'`, and `'Bobby'`
+
+```{r make_a_list, exercise = TRUE}
+
+```
+
+```{r make_a_list-solution}
+
+list(
+  sbp = c(120, 130, 140),
+  dbp = c(70, 80, 90),
+  person = c("Billy", "Bonny", "Bobby")
+)
+
+```
+
+### Subset a list
+
+The list from the previous exercise is given as `a`. Using `[`, create a list 
+that contains a numeric vector named `sbp` with values 120, 130, and 140.
+
+```{r subset_a_list, exercise = TRUE, exercise.eval = TRUE}
+
+a <- list(
+  sbp = c(120, 130, 140),
+  dbp = c(70, 80, 90),
+  person = c("Billy", "Bonny", "Bobby")
+)
+
+```
+
+```{r subset_a_list-solution}
+
+a <- list(
+  sbp = c(120, 130, 140),
+  dbp = c(70, 80, 90),
+  person = c("Billy", "Bonny", "Bobby")
+)
+
+a[1]
+
+```
+
+
+
+## Exercises
+
+The concepts you have learned may seem a little disjoint now, but everything
+comes together pretty seamlessly once you have practiced enough! Complete 
+these exercises to help solidify some of the content you've learned.
+
+### Proc Freq
+
+SAS has a useful procedure that counts frequencies and percentages for a categorical variable. R does not have such a function in its base package, 
+but it gives enough tools to make your own.
+
+A character vector `x` with 3 categories is given. Create a vector with 
+
+- names equal to the unique values in `x`.
+    
+- values equal to the count of each unique value in x, 
+  followed by the % of values in `x` that are this value.
+  The values should have the format of N (%). For example,
+  `'a'` appears three times in the given vector of length 6.
+  Therefore, the value for `'a'` should be 3 (50%). All % values
+  should be rounded to the nearest integer.
+
+
+```{r proc_freq, exercise = TRUE, exercise.eval = TRUE}
+
+library(glue)
+x <- c('a', 'a','b','c','a', 'b')
+
+```
+
+
+```{r proc_freq-hint-1}
+
+library(glue)
+x <- c('a', 'a','b','c','a', 'b')
+# create count values
+counts <- table(x)
+# create percentage values
+percs <- round(100 * counts / length(x))
+
+```
+
+
+```{r proc_freq-hint-2}
+
+library(glue)
+x <- c('a', 'a','b','c','a', 'b')
+# create count values
+counts <- table(x)
+# create percentage values
+percs <- round(100 * counts / length(x))
+# glue values and convert to character vector
+output <- as.character(glue("{counts} ({percs}%)"))
+
+```
+
+```{r proc_freq-hint-3}
+
+library(glue)
+x <- c('a', 'a','b','c','a', 'b')
+# create count values
+counts <- table(x)
+# create percentage values
+percs <- round(100 * counts / length(x))
+# glue values and convert to character vector
+output <- as.character(glue("{counts} ({percs}%)"))
+# set the names of the output
+names(output) <- names(counts)
+# print!
+output
+
+```
+
+```{r proc_freq-solution}
+
+library(glue)
+x <- c('a', 'a','b','c','a', 'b')
+# create count values
+counts <- table(x)
+# create percentage values
+percs <- round(100 * counts / length(x))
+# glue values and convert to character vector
+output <- as.character(glue("{counts} ({percs}%)"))
+# set the names of the output
+names(output) <- names(counts)
+# print!
+output
+
+```
+
+### Subsetting, part 1
+
+Create a subset of the given vector that does not contain any missing values.
+
+```{r subset_part1, exercise = TRUE, exercise.eval = TRUE}
+
+set.seed(329)
+x <- sample(c(4:10,NA_real_), 1000, replace = TRUE)
+
+```
+
+```{r subset_part1-hint-1}
+
+set.seed(329)
+x <- sample(c(4:10,NA_real_), 1000, replace = TRUE)
+x[!is.na(x)]
+
+```
+
+```{r subset_part1-solution}
+
+set.seed(329)
+x <- sample(c(4:10,NA_real_), 1000, replace = TRUE)
+x[!is.na(x)]
+
+```
+
+### Subsetting, part 2
+
+How many values in `x`, given below, are less than 0 or greater than 10?
+
+
+```{r subset_part2, exercise = TRUE, exercise.eval = TRUE}
+set.seed(329)
+x <- rnorm(1000, mean = 5, sd = 3)
+```
+
+```{r subset_part2-solution}
+
+set.seed(329)
+x <- rnorm(1000, mean = 5, sd = 3)
+
+# a clean solution
+y <- x[x < 0 | x > 10]
+length(y)
+
+# a slick solution
+# sum(x < 0 | x > 10)
+
+```
+
+### Subsetting, part 3
+
+How many dates in `x`, given below, occurred before January 1, 2000?
+
+```{r subset_part3, exercise = TRUE, exercise.eval = TRUE}
+
+set.seed(329)
+x <- sample(1e+10, size = 1000, replace = FALSE)
+x <- as.POSIXct(x, tz = "UTC", origin = '1970-01-01')
+
+```
+
+
+```{r subset_part3-solution}
+
+set.seed(329)
+x <- sample(1e+10, size = 1000, replace = FALSE)
+x <- as.POSIXct(x, tz = "UTC", origin = '1970-01-01')
+y2k <- as.POSIXct('2000-01-01', tz = 'UTC')
+
+sum(x<y2k)
+
+```
+
+
